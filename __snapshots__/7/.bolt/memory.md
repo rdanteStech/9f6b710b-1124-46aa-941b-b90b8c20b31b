@@ -1,0 +1,22 @@
+## User Preferences
+- Language: Spanish UI labels
+- Dark premium design system: primary #9E7FFF, bg #0a0a0f, card #1a1a26, border #2a2a3d
+
+## Architecture Decisions
+- GastroLayout: zones-based SVG floor plan editor at /home/project/src/pages/GastroLayout.tsx
+- TableItem.status: 'available' | 'occupied' | 'reserved' | 'cleaning'
+- STATUS_COLORS: available #10b981, occupied #9E7FFF, reserved #f59e0b, cleaning #94a3b8
+- SNAP_TABLE = 20px, SNAP_WALL = 40px, COUPLING_DIST = 5px
+- Text counter-rotation: transform={`rotate(${-table.rotation}, ${cx}, ${cy})`} on <text> elements
+- Proximity coupling: after boundary clamp, checks 4 edges vs all others (5px threshold, all tables)
+- Wall proximity coupling: snapToWall with COUPLING_DIST threshold, applies to ALL tables
+- Zone interface: { id, name, color, spacePath, tables }
+- approximateSpacePath(sp, steps=12): converts bezier SpacePath to dense polyline for physics
+- CURVED BOUNDARY PHYSICS: approxPoly computed ONCE per drag frame, used for ALL physics:
+  (1) clampInsidePolygon, (2) wall magnetic snap, (3) wall proximity coupling, (4) wall warning check
+  This makes curved walls the actual physical boundary, not the original straight segments.
+
+## Known Issues
+- CRITICAL: NEVER use `update` action type for GastroLayout.tsx — always use `file` action with complete content
+- User uploads files with corrupted paths (/home/project/home/project/...) — canonical path is /home/project/src/pages/GastroLayout.tsx
+- File has been corrupted multiple times by markdown text being written instead of TypeScript
